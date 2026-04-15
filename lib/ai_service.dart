@@ -17,23 +17,11 @@ class AIService {
   }
 
   /// إرسال سؤال إلى الذكاء الاصطناعي والحصول على إجابة
-  /// 
-  /// Parameters:
-  /// - [question]: السؤال المراد إرساله
-  /// - [conversationHistory]: سجل المحادثة السابقة (اختياري)
-  /// 
-  /// Returns:
-  /// - الإجابة من الذكاء الاصطناعي
-  /// 
-  /// Throws:
-  /// - [FirebaseFunctionsException] إذا حدث خطأ في الاتصال
-  /// - [Exception] إذا كان المستخدم غير مسجل دخول
   Future<String> askAI({
     required String question,
     List<Map<String, String>>? conversationHistory,
   }) async {
     try {
-      // التحقق من تسجيل دخول المستخدم
       final user = _auth.currentUser;
       if (user == null) {
         throw Exception('يجب تسجيل الدخول أولاً');
@@ -41,7 +29,6 @@ class AIService {
 
       debugPrint('📤 إرسال سؤال: $question');
 
-      // استدعاء Cloud Function
       final callable = _functions.httpsCallable('askAI');
       
       final response = await callable.call<Map<String, dynamic>>({
@@ -52,7 +39,6 @@ class AIService {
         'timestamp': DateTime.now().toIso8601String(),
       });
 
-      // معالجة الاستجابة
       final data = response.data as Map<String, dynamic>;
       final answer = data['answer'] as String?;
       
@@ -60,7 +46,9 @@ class AIService {
         throw Exception('لم تحصل على إجابة من الخادم');
       }
 
-      debugPrint('📥 تم استقبال الإجابة: ${answer.substring(0, 50)}...');
+      // ✅ تم تصحيح substring لتجنب RangeError إذا كانت الإجابة قصيرة
+      final previewLength = answer.length < 50 ? answer.length : 50;
+      debugPrint('📥 تم استقبال الإجابة: ${answer.substring(0, previewLength)}...');
       
       return answer;
       
