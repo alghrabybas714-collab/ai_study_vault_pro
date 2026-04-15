@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "9080019434",
+    "project_id": "ai-study-vault-pro",
+    "storage_bucket": "ai-study-vault-pro.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:9080019434:android:0ad812e490df6a1957ba93",
+        "android_client_info": {
+          "package_name": "com.ai.studyvault"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDpvjNTdxKrBMs2PtLHuukhHdA_JUqM4Vs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
