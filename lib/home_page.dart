@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomePage extends ConsumerStatefulWidget {
+// ✅ تم إزالة flutter_riverpod لأنه لم يكن مستخدماً
+class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
-  ConsumerState<HomePage> createState() => _HomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends ConsumerState<HomePage> {
+class _HomePageState extends State<HomePage> {
   final _controller = TextEditingController();
   final _functions = FirebaseFunctions.instance;
   final _db = FirebaseFirestore.instance;
@@ -37,11 +37,13 @@ class _HomePageState extends ConsumerState<HomePage> {
       if (doc.exists) {
         setState(() {
           _streak = doc.data()?['streak'] ?? 0;
-          _premium = doc.data()?['premium'] ?? false;
+          // ✅ تم تصحيح اسم الحقل من 'premium' إلى 'isPremium'
+          _premium = doc.data()?['isPremium'] ?? false;
         });
       }
     } catch (e) {
-      print('Error loading user data: $e');
+      // ✅ تم استبدال print بـ debugPrint
+      debugPrint('Error loading user data: $e');
     }
   }
 
@@ -61,18 +63,21 @@ class _HomePageState extends ConsumerState<HomePage> {
 
     try {
       final result = await _functions.httpsCallable('askAI').call({
-        'input': input,
+        'question': input,
       });
+
+      // ✅ تم تصحيح استخراج الإجابة من Map بدلاً من String مباشرة
+      final data = result.data as Map<String, dynamic>;
+      final answer = data['answer'] as String? ?? 'لم تحصل على إجابة';
 
       setState(() {
         _chatMessages.add(ChatMessage(
-          text: result.data as String,
+          text: answer,
           isUser: false,
           timestamp: DateTime.now(),
         ));
       });
 
-      // Log event
       await _logEvent('chat');
     } catch (e) {
       setState(() {
@@ -108,7 +113,8 @@ class _HomePageState extends ConsumerState<HomePage> {
 
       await _logEvent('streak');
     } catch (e) {
-      print('Error updating streak: $e');
+      // ✅ تم استبدال print بـ debugPrint
+      debugPrint('Error updating streak: $e');
     }
   }
 
@@ -117,18 +123,21 @@ class _HomePageState extends ConsumerState<HomePage> {
       final uid = _auth.currentUser?.uid;
       if (uid == null) return;
 
-      _premium = !_premium;
+      // ✅ تم نقل تغيير الحالة داخل setState
+      setState(() {
+        _premium = !_premium;
+      });
 
+      // ✅ تم تصحيح اسم الحقل إلى 'isPremium'
       await _db.collection('users').doc(uid).set(
-        {'premium': _premium},
+        {'isPremium': _premium},
         SetOptions(merge: true),
       );
 
-      setState(() {});
-
       await _logEvent(_premium ? 'premium_enabled' : 'premium_disabled');
     } catch (e) {
-      print('Error toggling premium: $e');
+      // ✅ تم استبدال print بـ debugPrint
+      debugPrint('Error toggling premium: $e');
     }
   }
 
@@ -143,7 +152,8 @@ class _HomePageState extends ConsumerState<HomePage> {
         'ts': FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      print('Error logging event: $e');
+      // ✅ تم استبدال print بـ debugPrint
+      debugPrint('Error logging event: $e');
     }
   }
 
@@ -153,7 +163,8 @@ class _HomePageState extends ConsumerState<HomePage> {
       if (!mounted) return;
       Navigator.of(context).pushReplacementNamed('/login');
     } catch (e) {
-      print('Error logging out: $e');
+      // ✅ تم استبدال print بـ debugPrint
+      debugPrint('Error logging out: $e');
     }
   }
 
