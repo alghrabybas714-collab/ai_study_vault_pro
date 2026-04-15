@@ -201,6 +201,11 @@ class FirestoreService {
       final user = _auth.currentUser;
       if (user == null) throw Exception('لا يوجد مستخدم مسجل دخول');
 
+      // ✅ تم إضافة حماية من القسمة على صفر
+      final accuracy = questionsAnswered > 0
+          ? (correctAnswers / questionsAnswered * 100).toStringAsFixed(2)
+          : '0.00';
+
       await _firestore
           .collection('users')
           .doc(user.uid)
@@ -210,7 +215,7 @@ class FirestoreService {
         'durationMinutes': durationMinutes,
         'questionsAnswered': questionsAnswered,
         'correctAnswers': correctAnswers,
-        'accuracy': (correctAnswers / questionsAnswered * 100).toStringAsFixed(2),
+        'accuracy': accuracy,
         'timestamp': FieldValue.serverTimestamp(),
       });
 
