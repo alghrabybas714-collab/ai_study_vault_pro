@@ -207,7 +207,9 @@ class ChatMessageModel {
 
   @override
   String toString() {
-    return 'ChatMessageModel(subject: $subject, message: ${message.substring(0, 30)}...)';
+    // ✅ تم تصحيح substring لتجنب RangeError إذا كانت الرسالة قصيرة
+    final previewLength = message.length < 30 ? message.length : 30;
+    return 'ChatMessageModel(subject: $subject, message: ${message.substring(0, previewLength)}...)';
   }
 }
 
@@ -234,3 +236,4 @@ class SubscriptionPlanModel {
     return 'SubscriptionPlanModel(name: $name, price: $price, duration: $durationDays days)';
   }
 }
+
